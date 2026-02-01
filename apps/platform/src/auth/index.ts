@@ -4,6 +4,7 @@ import { APIError } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { admin, haveIBeenPwned, username } from "better-auth/plugins";
 import { getHostelStudent } from "~/actions/hostel.core";
+import { getResultByRollNo } from "~/api/result";
 import { emailSchema, ROLES_ENUMS } from "~/constants";
 import {
   getDepartmentByRollNo,
@@ -12,7 +13,6 @@ import {
 import { db } from "~/db/connect";
 import { accounts, sessions, users, verifications } from "~/db/schema";
 import { appConfig } from "~/project.config";
-import type { ResultType } from "~/types/result";
 import { getBaseURL } from "~/utils/env";
 import { mailFetch, serverFetch } from "../lib/fetch-server";
 
@@ -283,28 +283,19 @@ async function getUserInfo(user: User & Record<string, unknown>): Promise<getUse
   const isStudent = isValidRollNumber(username);
 
   if (isStudent) {
-    console.log("Student");
+    console.log("[getUserInfo]: Student detected:", username);
 
-    const res = await serverFetch<{
-      message: string;
-      data: ResultType | null;
-      error?: string | null;
-    }>("/api/results/:rollNo", {
-      method: "GET",
-      params: {
-        rollNo: username,
-      },
-    });
-    const response = res.data;
-    console.log(res);
-    console.log(response?.data ? "has result" : "No result");
-
-    if (!response?.data) {
-      console.log("Result not found for roll number:", username);
-      throw new APIError("UPGRADE_REQUIRED", {
+    const { data, error } = await getResultByRollNo(username);
+    if (!data) {
+      throw new APIError("NOT_ACCEPTABLE", {
+        code: "RESULT_NOT_FOUND",
         message: "Result not found for the given roll number | Contact admin",
+        cause: { rollNo: username, error: error },
       });
     }
+    console.log("[getUserInfo]:", data ? "Result found" : "Result not found", username);
+
+
     // TODO: temporarily disable result check for 2025 batch
     if (username.startsWith("25")) {
       return {
@@ -314,22 +305,22 @@ async function getUserInfo(user: User & Record<string, unknown>): Promise<getUse
         emailVerified: true,
         email: user.email,
         username,
-        gender: response?.data?.gender || "not_specified",
+        gender: data?.gender || "not_specified",
         hostelId: "not_specified",
       };
     }
     const hostelStudent = await getHostelStudent({
       rollNo: username,
       email: user.email,
-      gender: response.data?.gender,
-      name: response.data.name,
-      cgpi: response.data.semesters.at(-1)?.cgpi || 0,
+      gender: data?.gender,
+      name: data.name,
+      cgpi: data.semesters.at(-1)?.cgpi || 0,
     });
 
     return {
       other_roles: [ROLES_ENUMS.STUDENT],
       department: getDepartmentByRollNo(username) as string,
-      name: response.data.name.toUpperCase(),
+      name: data.name.toUpperCase(),
       emailVerified: true,
       email: user.email,
       username,

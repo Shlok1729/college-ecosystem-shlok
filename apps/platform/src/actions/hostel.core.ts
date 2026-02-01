@@ -822,7 +822,7 @@ const getHostelStudentSchema = z.object({
   name: z.string(),
   email: z.string().email(),
   rollNo: z.string(),
-  gender: genderSchema,
+  gender: genderSchema.optional(),
   cgpi: z.number(),
 });
 

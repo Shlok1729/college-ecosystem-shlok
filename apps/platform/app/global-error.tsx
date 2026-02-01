@@ -34,15 +34,13 @@ export default function GlobalError({
         <Provider>
           <main className="relative min-h-screen w-full flex flex-col items-center justify-center p-4 overflow-hidden">
 
-            {/* --- Ambient Background Effects --- */}
-            <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-red-500/10 blur-[120px] rounded-full mix-blend-screen pointer-events-none" />
-            <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-orange-500/10 blur-[120px] rounded-full mix-blend-screen pointer-events-none" />
+            <div className="absolute top-[-20%] left-[-10%] size-125 bg-red-500/10 blur-[120px] rounded-full mix-blend-screen pointer-events-none" />
+            <div className="absolute bottom-[-20%] right-[-10%] size-125 bg-orange-500/10 blur-[120px] rounded-full mix-blend-screen pointer-events-none" />
 
-            {/* --- Glass Card Container --- */}
             <div className="relative z-10 w-full max-w-lg bg-background/60 backdrop-blur-xl border border-border/50 shadow-2xl rounded-3xl p-8 md:p-12 text-center">
 
               {/* Icon Wrapper */}
-              <div className="mx-auto mb-8 h-20 w-20 rounded-2xl bg-gradient-to-br from-red-500/10 to-orange-500/10 border border-red-500/20 flex items-center justify-center shadow-[0_0_30px_rgba(239,68,68,0.2)]">
+              <div className="mx-auto mb-8 h-20 w-20 rounded-2xl bg-linear-to-br from-red-500/10 to-orange-500/10 border border-red-500/20 flex items-center justify-center shadow-[0_0_30px_rgba(239,68,68,0.2)]">
                 <ServerCrash className="w-10 h-10 text-red-500" />
               </div>
 
